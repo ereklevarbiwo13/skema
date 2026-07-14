@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+  <div class="col-lg-8">
+    <h2>კალათა</h2>
+    {% if cart_items %}
+      {% for item in cart_items %}
+      <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <img src="{{ item.product.image_filename if item.product.image_filename and item.product.image_filename.startswith('http') else url_for('static', filename='images/' ~ (item.product.image_filename or 'default.png')) }}" class="img-thumbnail mr-3" style="width:96px; height:auto;" alt="{{ item.product.name }}">
+            <div>
+              <h5>{{ item.product.name }}</h5>
+              <p class="mb-0 text-muted">{{ item.product.specs }}</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <div>{{ item.qty }} × {{ item.product.price }} ₾</div>
+            <a class="btn btn-outline-secondary btn-sm mt-2" href="{{ url_for('remove_from_cart', product_id=item.product.id) }}">წაშლა</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-info">კალათა ცარიელია.</div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h4>გადახდა</h4>
+        <p class="lead">საერთო ფასი: <strong>{{ total }} ₾</strong></p>
+        <form method="post" action="{{ url_for('checkout') }}">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            {{ form.phone.label }}
+            {{ form.phone(class="form-control") }}
+          </div>
+          <div class="form-group">
+            {{ form.address.label }}
+            {{ form.address(class="form-control", rows=3) }}
+          </div>
+          <div class="form-group">
+            {{ form.payment_method.label }}
+            {{ form.payment_method(class="form-control") }}
+          </div>
+          {{ form.submit(class="btn btn-primary btn-block") }}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
